@@ -36,6 +36,9 @@
 
 <script>
     import axios from 'axios';
+
+    const API_URL = process.env.API_URL || 'http://localhost:3000';
+
     export default {
         props: ['ad'],
         data() {
@@ -73,7 +76,7 @@
             },
 
             save() {
-                axios.put('http://localhost:3000/ads/' + this.internalAd.id, this.internalAd)
+                axios.put(API_URL + '/ads/' + this.internalAd.id, this.internalAd)
                     .then(() => console.log('update ad success'))
                     .catch(error => console.log('update ad error', error));
             }
