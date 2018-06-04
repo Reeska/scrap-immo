@@ -1,3 +1,5 @@
+const webpack = require('webpack');
+
 module.exports = {
     devServer: {
         open: process.platform === 'darwin',
@@ -6,5 +8,12 @@ module.exports = {
         https: false,
         hotOnly: false,
         disableHostCheck: true
+    },
+    configureWebpack: {
+        plugins: [
+            new webpack.DefinePlugin({
+                'process.env.API_URL': "'" + process.env.API_URL + "'"
+            })
+        ]
     }
 };

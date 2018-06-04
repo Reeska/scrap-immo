@@ -21,6 +21,8 @@
     // import sample from '../../samples/search';
     import SearchAd from './SearchAd';
 
+    const API_URL = process.env.API_URL || 'http://localhost:3000';
+
     export default {
         components: {SearchAd},
         data() {
@@ -32,7 +34,7 @@
             }
         },
         async created() {
-            const response = await axios.get('http://localhost:3000/ads');
+            const response = await axios.get(API_URL + '/ads');
 
             this.items = response.data;
         },
