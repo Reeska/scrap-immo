@@ -22,10 +22,10 @@
     "koa-bodyparser": "^4.2.1",
     "koa-route": "^3.2.0",
     "pg": "^7.4.3",
-    "sequelize": "^4.37.10"
+    "sequelize": "^4.37.10",
+    "esm": "^3.0.41"
   },
   "devDependencies": {
-    "esm": "^3.0.41",
     "nodemon": "^1.17.5"
   }
 }
