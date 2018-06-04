@@ -1,5 +1,7 @@
 <template>
-    <div class="ad" :class="{'ignore': internalAd.data.ignore, 'favorite': internalAd.data.favorite}">
+    <div class="ad"
+         :class="{'ignore': internalAd.data.ignore, 'favorite': internalAd.data.favorite}"
+         :style="{'background-image': 'url(' + internalAd.cover + ')', 'height': '160px'}">
         <div class="new" v-show="internalAd.data.new">
             New
             <i class="fas fa-check-circle" @click="setNew()"></i>
@@ -16,7 +18,7 @@
             </div>
         </div>
 
-        <img :src="internalAd.cover"/>
+        <!--<img :src="internalAd.cover"/>-->
 
         <div class="summary">
             <div class="price">{{ internalAd.price | number }} &euro;</div>
@@ -85,11 +87,14 @@
 </script>
 
 <style scoped lang="scss">
+    @import '../scss/variable';
+
     .ad {
         display: inline-block;
         width: 310px;
         height: 145px;
         position: relative;
+        background-size: 100% 100%;
 
         &.ignore {
             opacity: 0.4;
@@ -209,6 +214,13 @@
                     }
                 }
             }
+        }
+    }
+
+    @media screen and (max-width: 620px) {
+        .ad {
+            width: 100%;
+            height: 200px;
         }
     }
 </style>
