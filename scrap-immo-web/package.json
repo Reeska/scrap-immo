@@ -11,9 +11,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "vue": "^2.5.16",
-    "vuetify": "^1.0.18"
-  },
-  "devDependencies": {
+    "vuetify": "^1.0.18",
     "@vue/cli-plugin-babel": "^3.0.0-beta.15",
     "@vue/cli-plugin-eslint": "^3.0.0-beta.15",
     "@vue/cli-service": "^3.0.0-beta.15",
