@@ -10,6 +10,10 @@ const app = new Koa();
 app.use(cors());
 app.use(bodyParser());
 
+app.use(route.get('/', ctx => {
+    ctx.body = 'Hello world';
+}));
+
 app.use(route.get('/ads', async (ctx) => {
     console.log('route /ads')
     ctx.body = await findAllAds();
@@ -21,11 +25,8 @@ app.use(route.put('/ads/:id', async (ctx, id) => {
     ctx.body = await updateAd(ctx.request.body)
 }));
 
+const port = process.env.PORT || 3000;
 
-// app.use(async ctx => {
-//     ctx.body = 'Hello World';
-// });
+console.log('Started at port ', port)
 
-console.log('Started')
-
-app.listen(3000);
+app.listen(port);
