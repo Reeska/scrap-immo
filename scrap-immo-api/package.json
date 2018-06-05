@@ -18,12 +18,13 @@
     "@types/koa-route": "^3.2.3",
     "axios": "^0.18.0",
     "cheerio": "^1.0.0-rc.2",
+    "esm": "^3.0.41",
     "koa": "^2.5.1",
     "koa-bodyparser": "^4.2.1",
     "koa-route": "^3.2.0",
     "pg": "^7.4.3",
     "sequelize": "^4.37.10",
-    "esm": "^3.0.41"
+    "xml2js": "^0.4.19"
   },
   "devDependencies": {
     "nodemon": "^1.17.5"

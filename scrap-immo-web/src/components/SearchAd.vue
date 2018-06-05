@@ -1,10 +1,14 @@
 <template>
     <div class="ad"
          :class="{'ignore': internalAd.data.ignore, 'favorite': internalAd.data.favorite}"
-         :style="{'background-image': 'url(' + internalAd.cover + ')', 'height': '160px'}">
+         :style="{'background-image': 'url(' + internalAd.cover + ')'}">
         <div class="new" v-show="internalAd.data.new">
             New
             <i class="fas fa-check-circle" @click="setNew()"></i>
+        </div>
+
+        <div class="tags" v-show="ad.tags.length">
+            <span v-for="(tag, index) in ad.tags" :key="tag">{{ tag }} <span v-if="index < ad.tags.length-1">, </span></span>
         </div>
 
         <div class="comment" v-show="commentShown">
@@ -18,18 +22,22 @@
             </div>
         </div>
 
-        <!--<img :src="internalAd.cover"/>-->
-
         <div class="summary">
             <div class="price">{{ internalAd.price | number }} &euro;</div>
             <div class="rooms">{{ internalAd.rooms }} rooms</div>
             <div class="space">{{ internalAd.space }} m2</div>
-            <div class="actions">
+            <div class="space">
+                {{ internalAd.floor ? internalAd.floor : 'n/a' }} floor
+            </div>
+            <div class="summary-primary actions">
                 <i class="fas fa-ban" :class="{'enabled' : internalAd.data.ignore}" @click="setIgnore()"></i>
                 <i class="fas fa-heart" :class="{'enabled' : internalAd.data.favorite}" @click="setFavorite()"></i>
                 <i class="fas fa-comment" :class="{'enabled' : internalAd.data.comment}" @click="toggleComment(true)"></i>
             </div>
-            <div class="id">
+            <div class="summary-primary">
+                <i class="fas fa-clock"></i> {{ internalAd.vendorUpdateDate | moment('DD/MM HH:mm') }}
+            </div>
+            <div class="summary-primary id">
                 <a :href="internalAd.url">#{{ internalAd.id }}</a>
             </div>
         </div>
@@ -46,7 +54,8 @@
         data() {
             return {
                 internalAd: {},
-                commentShown: false
+                commentShown: false,
+                tags: ['plaisance', 'sansAscenseur']
             }
         },
         created() {
@@ -92,7 +101,7 @@
     .ad {
         display: inline-block;
         width: 310px;
-        height: 145px;
+        height: 186px;
         position: relative;
         background-size: 100% 100%;
 
@@ -125,6 +134,21 @@
                     display: inline;
                 }
             }
+        }
+
+        .tags {
+            position: absolute;
+            left: 8px;
+            bottom: 8px;
+            background-color: white;
+            padding: 2px 6px;
+            border-radius: 6px;
+            border: 1px solid #b4b8ef;
+            color: #0800ff;
+            -webkit-box-shadow: 0 1px 6px 1px #efb4b4;
+            box-shadow: 0 1px 6px 1px #c0b4ef;
+            width: 127px;
+            text-align: left;
         }
 
         .comment {
@@ -186,12 +210,13 @@
 
                 &.id {
                     font-family: monospace;
+                }
+
+                &.summary-primary {
                     background-color: rgba(182, 183, 171, 0.22);
                 }
 
                 &.actions {
-                    background-color: rgba(182, 183, 171, 0.22);
-
                     i {
                         margin: 0 10px;
                         cursor: pointer;
