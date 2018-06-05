@@ -143,6 +143,9 @@ function apiLoadAdsTransformed(options = {pageNumber: 1}) {
                     if (/porte d'orléans/.test(descriptif)) { tags.push('porteOrleans'); }
                     if (/plaisance/.test(descriptif)) { tags.push('plaisance'); }
                     if (/sans ascenseur/.test(descriptif)) { tags.push('sansAscenseur'); }
+                    if (/didot/.test(descriptif)) { tags.push('didot'); }
+                    if (/penerty/.test(descriptif)) { tags.push('pernety'); }
+                    if (/cité universitaire/.test(descriptif)) { tags.push('citéUniversitaire'); }
 
                     const findFloor = descriptif.match(/([^ ]+) étage/);
 
