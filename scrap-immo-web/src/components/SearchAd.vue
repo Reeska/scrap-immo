@@ -67,17 +67,20 @@
             },
 
             saveComment() {
+                this.internalAd.data.new = false;
                 this.save();
                 this.toggleComment(false);
             },
 
             setFavorite() {
                 this.internalAd.data.favorite = !this.internalAd.data.favorite;
+                this.internalAd.data.new = false;
                 this.save();
             },
 
             setIgnore() {
                 this.internalAd.data.ignore = !this.internalAd.data.ignore;
+                this.internalAd.data.new = false;
                 this.save();
             },
 
@@ -88,7 +91,10 @@
 
             save() {
                 axios.put(API_URL + '/ads/' + this.internalAd.id, this.internalAd)
-                    .then(() => console.log('update ad success'))
+                    .then(() => {
+                        console.log('update ad success')
+                        this.$emit('adChanged', this.internalAd)
+                    })
                     .catch(error => console.log('update ad error', error));
             }
         }

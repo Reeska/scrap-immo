@@ -17,7 +17,7 @@
                 <span v-else-if="!loading">{{ filtredAds.length }} items</span>
             </v-alert>
 
-            <search-ad v-for="item in filtredAds" :key="item.id" :ad="item"/>
+            <search-ad v-for="item in filtredAds" :key="item.id" :ad="item" @adChanged="adChanged()"/>
         </div>
     </div>
 </template>
@@ -68,6 +68,13 @@
                 if (this.filter.category === 'ignored') {
                     return this.items.filter(ad => ad.data.ignore);
                 }
+            },
+
+        },
+
+        methods: {
+            adChanged() {
+                this.items = [...this.items]
             }
         }
     }
