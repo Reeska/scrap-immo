@@ -1,4 +1,4 @@
-import {database} from './database';
+import {database} from '../database';
 
 export async function getAds() {
     return await database.query('select id, data, create_date as createDate, update_date as updateDate from ad',
