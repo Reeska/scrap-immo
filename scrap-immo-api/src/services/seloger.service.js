@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {parseString} from 'xml2js';
-import {createAd, getAds} from './ads.repository';
+import {createAd, getAds} from './announces.repository';
 
 const API_DOMAIN = 'http://ws.seloger.com';
 
@@ -31,17 +31,7 @@ function apiLoadAdsTransformed(options = {pageNumber: 1}) {
                 .map(ad => {
                     const cover = Array.isArray(ad.photos.photo) ? ad.photos.photo[0].stdUrl : ad.photos.photo.stdUrl;
                     const bedrooms = ad.nbChambre;
-
-                    const tags = [];
                     const descriptif = ad.descriptif.toLowerCase();
-
-                    if (/porte d'orléans/.test(descriptif)) { tags.push('porteOrleans'); }
-                    if (/plaisance/.test(descriptif)) { tags.push('plaisance'); }
-                    if (/sans ascenseur/.test(descriptif)) { tags.push('sansAscenseur'); }
-                    if (/didot/.test(descriptif)) { tags.push('didot'); }
-                    if (/pernety/.test(descriptif)) { tags.push('pernety'); }
-                    if (/cité universitaire/.test(descriptif)) { tags.push('citéUniversitaire'); }
-
                     const findFloor = descriptif.match(/([^ ]+) étage/);
 
                     return {
@@ -55,9 +45,9 @@ function apiLoadAdsTransformed(options = {pageNumber: 1}) {
                         cover,
                         agency: ad.contact && ad.contact.nom,
                         description: ad.descriptif,
-                        tags,
                         vendorUpdateDate: ad.dtFraicheur,
-                        vendorCreatedDate: ad.dtFraicheur
+                        vendorCreatedDate: ad.dtFraicheur,
+                        vendor: 'seloger'
                     }
                 });
 
@@ -84,21 +74,23 @@ export async function findAllAds() {
 
     } while (results.pageNumber < results.pageCount);
 
-    const localAds = await getAds();
-    const mapLocalAds = {};
-    localAds.forEach(ad => mapLocalAds[ad.id] = ad);
+    return items;
 
-    return Promise.all(items
-        .map(async ad => {
-            let localAd = mapLocalAds[ad.id];
-
-            if (!localAd) {
-                localAd = await createAd({id: ad.id, data: {new: true}})
-            }
-
-            return {
-                ...ad,
-                ...localAd
-            }
-        }));
+    // const localAds = await getAds();
+    // const mapLocalAds = {};
+    // localAds.forEach(ad => mapLocalAds[ad.id] = ad);
+    //
+    // return Promise.all(items
+    //     .map(async ad => {
+    //         let localAd = mapLocalAds[ad.id];
+    //
+    //         if (!localAd) {
+    //             localAd = await createAd({id: ad.id, data: {new: true}})
+    //         }
+    //
+    //         return {
+    //             ...ad,
+    //             ...localAd
+    //         }
+    //     }));
 }

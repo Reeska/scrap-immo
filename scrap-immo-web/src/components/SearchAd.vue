@@ -2,9 +2,15 @@
     <div class="ad"
          :class="{'ignore': internalAd.data.ignore, 'favorite': internalAd.data.favorite}"
          :style="{'background-image': 'url(' + internalAd.cover + ')'}">
-        <div class="new" v-show="internalAd.data.new">
-            New
-            <i class="fas fa-check-circle" @click="setNew()"></i>
+        <div class="flags">
+            <div class="vendor" :class="internalAd.vendor">
+                {{ internalAd.vendor }}
+            </div>
+
+            <div class="new" v-show="internalAd.data.new">
+                New
+                <i class="fas fa-check-circle" @click="setNew()"></i>
+            </div>
         </div>
 
         <div class="tags" v-show="ad.tags.length">
@@ -119,28 +125,53 @@
             background-color: #f3212182;
         }
 
-        .new {
+        .flags {
             position: absolute;
             left: 8px;
             top: 8px;
-            background-color: white;
-            padding: 2px 6px;
-            border-radius: 6px;
-            border: 1px solid #efb4b4;
-            color: red;
-            box-shadow: 0 1px 6px 1px #efb4b4;
+            display: flex;
 
-            .fa-check-circle {
-                display: none;
-                cursor: pointer;
+            > div {
+                background-color: white;
+                padding: 2px 6px;
+                border-radius: 6px;
+                margin: 0 5px;
             }
 
-            &:hover {
+            .vendor {
+                &.pap {
+                    border: 1px solid #28a5d9;
+                    color: white;
+                    box-shadow: 0 1px 6px 1px #28a5d9;
+                    background-color: #28a5d9;
+                }
+
+                &.seloger {
+                    border: 1px solid #e10034;
+                    color: white;
+                    box-shadow: 0 1px 6px 1px #e10034;
+                    background-color: #e10034;
+                }
+            }
+
+            .new {
+                border: 1px solid #efb4b4;
+                color: red;
+                box-shadow: 0 1px 6px 1px #efb4b4;
+
                 .fa-check-circle {
-                    display: inline;
+                    display: none;
+                    cursor: pointer;
+                }
+
+                &:hover {
+                    .fa-check-circle {
+                        display: inline;
+                    }
                 }
             }
         }
+
 
         .tags {
             position: absolute;

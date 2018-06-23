@@ -2,9 +2,9 @@ import Koa from 'koa';
 import route from 'koa-route';
 import bodyParser from 'koa-bodyparser';
 import cors from '@koa/cors';
-import {apiLoadAds, findAllAds} from './services/seloger.service';
-import {updateAd} from './services/ads.repository';
-import {findAllAnnounces, getAnnounces} from './services/pap.service';
+import {apiLoadAds} from './services/seloger.service';
+import {updateAd} from './services/announces.repository';
+import {getAnnounces} from './services/annouces.service';
 
 const app = new Koa();
 
@@ -15,21 +15,19 @@ app.use(route.get('/', ctx => {
     ctx.body = 'Hello world';
 }));
 
-app.use(route.get('/seloger', async (ctx) => {
-    console.log('route /ads')
-    ctx.body = await apiLoadAds();
-}));
-
-app.use(route.get('/pap', async (ctx) => {
-    console.log('route /pap')
-    ctx.body = await getAnnounces();
-}));
+// app.use(route.get('/seloger', async (ctx) => {
+//     console.log('route /ads');
+//     ctx.body = await apiLoadAds();
+// }));
+//
+// app.use(route.get('/pap', async (ctx) => {
+//     console.log('route /pap');
+//     ctx.body = await getAnnounces();
+// }));
 
 app.use(route.get('/ads', async (ctx) => {
-    console.log('route /ads')
-    const pap = await findAllAnnounces();
-    const seloger = await findAllAds();
-    ctx.body = [...seloger, ...pap];
+    console.log('route /ads');
+    ctx.body = await getAnnounces();
 }));
 
 app.use(route.put('/ads/:id', async (ctx, id) => {

@@ -33,9 +33,7 @@ export async function findAllAnnounces() {
             tags: [],
             vendorUpdateDate: null,
             vendorCreatedDate: null,
-            data: {
-                new: true
-            }
+            vendor: 'pap'
         }
     })
 }
