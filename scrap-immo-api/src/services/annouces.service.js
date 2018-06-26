@@ -2,8 +2,8 @@ import {findAllAnnounces} from './pap.service';
 import {findAllAds} from './seloger.service';
 import {createAd, getAds} from './announces.repository';
 
-export async function getAnnounces() {
-    const announcesArray = await Promise.all([findAllAnnounces(), findAllAds()]);
+export async function getAnnounces(params) {
+    const announcesArray = await Promise.all([findAllAnnounces(params), findAllAds(params)]);
 
     const localAds = await getAds();
     const mapLocalAds = {};

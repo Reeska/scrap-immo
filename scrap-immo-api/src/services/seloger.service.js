@@ -1,41 +1,61 @@
 import axios from 'axios';
 import {parseString} from 'xml2js';
-import {createAd, getAds} from './announces.repository';
 
 const API_DOMAIN = 'http://ws.seloger.com';
 
-// ci=750114&idtt=2&idtypebien=1&naturebien=1,2,4&nb_pieces=2,3&pxbtw=400000/530000&surfacebtw=40/NaN
+async function findInternalZipCode(zipCode) {
+    const response = await axios.get('https://autocomplete.svc.groupe-seloger.com/auto/complete/0/ALL/6', {
+        params: {
+            text: zipCode
+        }
+    });
 
-export function apiLoadAds(options = {pageNumber: 1}) {
+    const codes = response.data;
+
+    if (!codes && codes.length === 0) {
+        return null;
+    }
+
+    return codes[0].Params.ci;
+}
+
+function apiLoadAds({zipInternalCodes = 750114, pageNumber = 1}) {
     return axios
         .get(API_DOMAIN + '/search.xml', {
             params: {
-                ci: '750114',
+                ci: zipInternalCodes.join(','),
                 idtt: 2,
                 idtypebien: 1,
                 naturebien: '1,2,4',
                 nb_pieces: '2,3',
                 pxbtw: '400000/530000',
                 surfacebtw: '40/NaN',
-                'SEARCHpg': options.pageNumber
+                'SEARCHpg': pageNumber
             }
         })
         .then(response => response.data)
         .then(data => new Promise(resolve => parseString(data, {explicitArray: false}, (err, result) => resolve(result))))
 }
 
-function apiLoadAdsTransformed(options = {pageNumber: 1}) {
+function apiLoadAdsTransformed(options) {
     return apiLoadAds(options)
         .then(({recherche}) => {
-            const items = recherche.annonces.annonce
+            const annonces = recherche.annonces;
+            const items = (annonces ? annonces.annonce : [])
                 .map(ad => {
-                    const cover = Array.isArray(ad.photos.photo) ? ad.photos.photo[0].stdUrl : ad.photos.photo.stdUrl;
                     const bedrooms = ad.nbChambre;
                     const descriptif = ad.descriptif.toLowerCase();
                     const findFloor = descriptif.match(/([^ ]+) étage/);
+                    const photosLength = Number(ad.nbPhotos);
+                    let cover;
+
+                    if (photosLength > 0) {
+                        cover = Array.isArray(ad.photos.photo) ? ad.photos.photo[0].stdUrl : ad.photos.photo.stdUrl;
+                    }
 
                     return {
                         id: ad.idAnnonce,
+                        zip: ad.cp,
                         price: ad.prix,
                         rooms: ad.nbPiece,
                         floor: findFloor ? findFloor[1] : null,
@@ -59,13 +79,15 @@ function apiLoadAdsTransformed(options = {pageNumber: 1}) {
         })
 }
 
-export async function findAllAds() {
+export async function findAllAds({zipCodes = ['75014']}) {
     let pageNumber = 1;
     let results;
     let items = [];
 
+    const zipInternalCodes = await Promise.all(zipCodes.map(findInternalZipCode));
+
     do {
-        results = await apiLoadAdsTransformed({pageNumber});
+        results = await apiLoadAdsTransformed({zipInternalCodes, pageNumber});
         pageNumber++;
 
         items = [...items, ...results.items];
@@ -75,22 +97,4 @@ export async function findAllAds() {
     } while (results.pageNumber < results.pageCount);
 
     return items;
-
-    // const localAds = await getAds();
-    // const mapLocalAds = {};
-    // localAds.forEach(ad => mapLocalAds[ad.id] = ad);
-    //
-    // return Promise.all(items
-    //     .map(async ad => {
-    //         let localAd = mapLocalAds[ad.id];
-    //
-    //         if (!localAd) {
-    //             localAd = await createAd({id: ad.id, data: {new: true}})
-    //         }
-    //
-    //         return {
-    //             ...ad,
-    //             ...localAd
-    //         }
-    //     }));
 }

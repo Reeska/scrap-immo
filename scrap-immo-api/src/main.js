@@ -2,7 +2,7 @@ import Koa from 'koa';
 import route from 'koa-route';
 import bodyParser from 'koa-bodyparser';
 import cors from '@koa/cors';
-import {apiLoadAds} from './services/seloger.service';
+// import {apiLoadAds} from './services/seloger.service';
 import {updateAd} from './services/announces.repository';
 import {getAnnounces} from './services/annouces.service';
 
@@ -27,7 +27,12 @@ app.use(route.get('/', ctx => {
 
 app.use(route.get('/ads', async (ctx) => {
     console.log('route /ads');
-    ctx.body = await getAnnounces();
+
+    const {zipCodes} = {zipCodes: '75014', ...ctx.request.query};
+
+    ctx.body = await getAnnounces({
+        zipCodes: zipCodes.split(',')
+    });
 }));
 
 app.use(route.put('/ads/:id', async (ctx, id) => {

@@ -1,5 +1,7 @@
 <template>
     <div class="hello">
+        <zips :value="zipCodes" @change="zipChanged" />
+
         <v-container class="filter">
             <v-radio-group v-model="filter.category" :hide-details="true" :row="true" class="radio-group-bla">
                 <v-radio label="All" value="all" />
@@ -26,27 +28,31 @@
     import axios from 'axios';
     // import sample from '../../samples/search';
     import SearchAd from './SearchAd';
+    import Zips from './Zips';
 
     const API_URL = process.env.API_URL;
 
     export default {
-        components: {SearchAd},
+        components: {Zips, SearchAd},
+
         data() {
+            const _zipCodes = window.localStorage.getItem('zipCodes')
+            const zipCodes = _zipCodes ? JSON.parse(_zipCodes):  ['75013', '75014'];
+
             return {
                 items: [],
                 loading: false,
                 filter: {
                     category: 'relevant'
-                }
+                },
+                zipCodes
             }
         },
-        async created() {
-            this.loading = true;
-            const response = await axios.get(API_URL + '/ads');
 
-            this.items = response.data;
-            this.loading = false;
+        async created() {
+            this.loadAnnounces()
         },
+
         computed: {
             filtredAds() {
                 if (this.filter.category === 'all') {
@@ -69,12 +75,28 @@
                     return this.items.filter(ad => ad.data.ignore);
                 }
             },
-
         },
 
         methods: {
+            async loadAnnounces() {
+                this.loading = true;
+                const response = await axios.get(API_URL + '/ads', {
+                    params: {
+                        zipCodes: this.zipCodes.join(',')
+                    }
+                });
+
+                this.items = response.data;
+                this.loading = false;
+            },
+
             adChanged() {
                 this.items = [...this.items]
+            },
+
+            zipChanged(zipCodes) {
+                window.localStorage.setItem('zipCodes', JSON.stringify(zipCodes))
+                this.loadAnnounces()
             }
         }
     }
