@@ -19,7 +19,7 @@ async function findInternalZipCode(zipCode) {
     return codes[0].Params.ci;
 }
 
-function apiLoadAds({zipInternalCodes = 750114, pageNumber = 1}) {
+export function apiLoadAds({zipInternalCodes = '750114', pageNumber = 1}) {
     return axios
         .get(API_DOMAIN + '/search.xml', {
             params: {
