@@ -19,7 +19,7 @@
 
         <div class="comment" v-show="commentShown">
             <div class="inner">
-                <textarea v-model="internalAd.data.comment" placeholder="Write a comment"></textarea>
+                <textarea ref="comment" v-model="internalAd.data.comment" placeholder="Write a comment"></textarea>
 
                 <div>
                     <v-btn @click="toggleComment(false)">Cancel</v-btn>
@@ -57,6 +57,7 @@
 
     export default {
         props: ['ad'],
+
         data() {
             return {
                 internalAd: {},
@@ -64,12 +65,18 @@
                 tags: ['plaisance', 'sansAscenseur']
             }
         },
+
         created() {
           this.internalAd = this.ad;  
         },
+
         methods: {
             toggleComment(visibility) {
                 this.commentShown = visibility;
+
+                if (visibility) {
+                    this.$nextTick(() => this.$refs.comment.focus())
+                }
             },
 
             saveComment() {
@@ -201,10 +208,18 @@
             .inner {
                 padding: 10px;
                 text-align: center;
+                display: flex;
+                flex-direction: column;
+                height: 100%;
 
                 textarea {
                     width: 100%;
-                    height: 74px;
+                    flex: 1;
+
+                    &::placeholder {
+                        color: white;
+                        font-style: italic;
+                    }
                 }
             }
         }

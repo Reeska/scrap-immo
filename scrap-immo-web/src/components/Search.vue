@@ -4,11 +4,11 @@
 
         <v-container class="filter">
             <v-radio-group v-model="filter.category" :hide-details="true" :row="true" class="radio-group-bla">
-                <v-radio label="All" value="all" />
-                <v-radio label="Relevant" value="relevant" />
-                <v-radio label="New" value="new" />
-                <v-radio label="Favorites" value="favorite" />
-                <v-radio label="Ignored" value="ignored" />
+                <v-radio :label="'All (' + all.length + ')'" value="all" />
+                <v-radio :label="'Relevants (' + relevants.length + ')'" value="relevant" />
+                <v-radio :label="'News (' + news.length + ')'" value="new" />
+                <v-radio :label="'Favorites (' + favorites.length + ')'" value="favorite" />
+                <v-radio :label="'Ignored (' + ignores.length + ')'" value="ignored" />
             </v-radio-group>
         </v-container>
 
@@ -56,25 +56,45 @@
         computed: {
             filtredAds() {
                 if (this.filter.category === 'all') {
-                    return this.items;
+                    return this.all;
                 }
 
                 if (this.filter.category === 'relevant') {
-                    return this.items.filter(ad => !ad.data.ignore);
+                    return this.relevants;
                 }
 
                 if (this.filter.category === 'new') {
-                    return this.items.filter(ad => ad.data.new);
+                    return this.news;
                 }
 
                 if (this.filter.category === 'favorite') {
-                    return this.items.filter(ad => ad.data.favorite);
+                    return this.favorites;
                 }
 
                 if (this.filter.category === 'ignored') {
-                    return this.items.filter(ad => ad.data.ignore);
+                    return this.ignores;
                 }
             },
+
+            all() {
+                return this.items;
+            },
+
+            relevants() {
+                return this.items.filter(ad => !ad.data.ignore);
+            },
+
+            news() {
+                return this.items.filter(ad => ad.data.new);
+            },
+
+            favorites() {
+                return this.items.filter(ad => ad.data.favorite);
+            },
+
+            ignores() {
+                return this.items.filter(ad => ad.data.ignore);
+            }
         },
 
         methods: {
