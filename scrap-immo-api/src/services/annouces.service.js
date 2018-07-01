@@ -1,9 +1,13 @@
-import {findAllAnnounces} from './pap.service';
+import {papService} from './pap.service';
 import {findAllAds} from './seloger.service';
 import {createAd, getAds} from './announces.repository';
 
+const PORTE_ORLEANS = 'porteOrleans';
+const CITE_UNIVERSITAIRE = 'citéUniversitaire';
+const PERNETY = 'pernety';
+
 export async function getAnnounces(params) {
-    const announcesArray = await Promise.all([findAllAnnounces(params), findAllAds(params)]);
+    const announcesArray = await Promise.all([papService.findAllAnnounces(params), findAllAds(params)]);
 
     const localAds = await getAds();
     const mapLocalAds = {};
@@ -20,12 +24,12 @@ function transform(announce) {
     const tags = [];
     const descriptif = (announce.description || '').toLowerCase();
 
-    if (/porte d'orléans/.test(descriptif)) { tags.push('porteOrleans'); }
+    if (/porte d'orléans/.test(descriptif)) { tags.push(PORTE_ORLEANS); }
+    if (/cité universitaire/.test(descriptif)) { tags.push(CITE_UNIVERSITAIRE); }
+    if (/pernety/.test(descriptif)) { tags.push(PERNETY); }
     if (/plaisance/.test(descriptif)) { tags.push('plaisance'); }
     if (/sans ascenseur/.test(descriptif)) { tags.push('sansAscenseur'); }
     if (/didot/.test(descriptif)) { tags.push('didot'); }
-    if (/pernety/.test(descriptif)) { tags.push('pernety'); }
-    if (/cité universitaire/.test(descriptif)) { tags.push('citéUniversitaire'); }
 
     return {
         ...announce,
@@ -37,7 +41,12 @@ const augmented = mapLocalAds => async (announce) => {
     let localAd = mapLocalAds[announce.id];
 
     if (!localAd) {
-        localAd = await createAd({id: announce.id, data: {new: true}})
+        const tags = announce.tags;
+        const ignored = tags.includes(PORTE_ORLEANS) ||
+            tags.includes(PERNETY) ||
+            tags.includes(CITE_UNIVERSITAIRE);
+
+        localAd = await createAd({id: announce.id, data: {new: !ignored, ignored}})
     }
 
     return {

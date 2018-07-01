@@ -37,9 +37,5 @@
                 color: #bb3030;
             }
         }
-
-        a {
-            color: white;
-        }
     }
 </style>

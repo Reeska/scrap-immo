@@ -1,43 +1,59 @@
 <template>
     <div class="hello">
-        <zips :value="zipCodes" @change="zipChanged" />
+        <zips :value="zipCodes" @change="zipChanged"/>
 
         <v-container class="filter">
             <v-radio-group v-model="filter.category" :hide-details="true" :row="true" class="radio-group-bla">
-                <v-radio :label="'All (' + all.length + ')'" value="all" />
-                <v-radio :label="'Relevants (' + relevants.length + ')'" value="relevant" />
-                <v-radio :label="'News (' + news.length + ')'" value="new" />
-                <v-radio :label="'Favorites (' + favorites.length + ')'" value="favorite" />
-                <v-radio :label="'Ignored (' + ignores.length + ')'" value="ignored" />
+                <v-radio :label="'All (' + all.length + ')'" value="all"/>
+                <v-radio :label="'Relevants (' + relevants.length + ')'" value="relevant"/>
+                <v-radio :label="'News (' + news.length + ')'" value="new"/>
+                <v-radio :label="'Favorites (' + favorites.length + ')'" value="favorite"/>
+                <v-radio :label="'Ignored (' + ignores.length + ')'" value="ignored"/>
             </v-radio-group>
         </v-container>
 
         <div class="ads">
-            <v-alert :value="true" type="info">
+            <v-alert :value="true" :type="alertType">
                 <v-progress-circular indeterminate color="primary" v-show="loading"></v-progress-circular>
-                <span v-if="filtredAds.length === 0 && !loading">No results.</span>
+                <span v-if="alertType === 'error'">Failed</span>
+                <span v-else-if="filtredAds.length === 0 && !loading">No results.</span>
                 <span v-else-if="!loading">{{ filtredAds.length }} items</span>
             </v-alert>
 
-            <search-ad v-for="item in filtredAds" :key="item.id" :ad="item" @adChanged="adChanged()"/>
+            <v-tabs v-model="activeGroup">
+                <v-tab
+                        v-for="(value, key) in grouped"
+                        :key="key"
+                        ripple>
+                    {{ key }} ({{ value.length }})
+                </v-tab>
+
+                <v-tab-item
+                        :id="key"
+                        v-for="(value, key) in grouped"
+                        :key="key" >
+                    <announce v-for="item in value" :key="item.id" :ad="item" @adChanged="adChanged()"/>
+                </v-tab-item>
+            </v-tabs>
         </div>
     </div>
 </template>
 
 <script>
     import axios from 'axios';
+    import {groupBy} from 'lodash';
     // import sample from '../../samples/search';
-    import SearchAd from './SearchAd';
+    import Announce from './Announce';
     import Zips from './Zips';
 
     const API_URL = process.env.API_URL;
 
     export default {
-        components: {Zips, SearchAd},
+        components: {Zips, Announce},
 
         data() {
             const _zipCodes = window.localStorage.getItem('zipCodes')
-            const zipCodes = _zipCodes ? JSON.parse(_zipCodes):  ['75013', '75014'];
+            const zipCodes = _zipCodes ? JSON.parse(_zipCodes) : ['75013', '75014'];
 
             return {
                 items: [],
@@ -45,7 +61,9 @@
                 filter: {
                     category: 'relevant'
                 },
-                zipCodes
+                zipCodes,
+                activeGroup: null,
+                alertType: 'info'
             }
         },
 
@@ -94,20 +112,33 @@
 
             ignores() {
                 return this.items.filter(ad => ad.data.ignore);
+            },
+
+            grouped() {
+                return groupBy(this.filtredAds, announce => announce.zip);
             }
         },
 
         methods: {
             async loadAnnounces() {
-                this.loading = true;
-                const response = await axios.get(API_URL + '/ads', {
-                    params: {
-                        zipCodes: this.zipCodes.join(',')
-                    }
-                });
+                this.loading = true
+                this.alertType = 'info'
 
-                this.items = response.data;
-                this.loading = false;
+                try {
+                    const response = await axios.get(API_URL + '/ads', {
+                        params: {
+                            zipCodes: this.zipCodes.join(',')
+                        }
+                    });
+
+                    this.items = response.data;
+
+                    this.activeGroup = '75014';
+                } catch (e) {
+                    this.alertType = 'error'
+                } finally {
+                    this.loading = false;
+                }
             },
 
             adChanged() {
@@ -150,22 +181,22 @@
 
     .radio-group {
         > .input-group__input {
-            flex-direction: row!important;
+            flex-direction: row !important;
         }
 
         > .input-group__input > .radio.input-group {
-            flex-direction: row!important;
+            flex-direction: row !important;
         }
     }
 
     @media screen and (max-width: $mobile-width) {
         .radio-group {
             > .input-group__input {
-                flex-direction: column!important;
+                flex-direction: column !important;
             }
 
             > .input-group__input > .radio.input-group {
-                flex-direction: column!important;;
+                flex-direction: column !important;;
             }
         }
     }
