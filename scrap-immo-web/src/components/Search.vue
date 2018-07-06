@@ -29,7 +29,6 @@
                 </v-tab>
 
                 <v-tab-item
-                        :id="key"
                         v-for="(value, key) in grouped"
                         :key="key" >
                     <announce v-for="item in value" :key="item.id" :ad="item" @adChanged="adChanged()"/>
@@ -134,6 +133,10 @@
                     this.items = response.data;
 
                     this.activeGroup = '75014';
+
+                    this.$nextTick(() => {
+                        document.querySelector('.tabs__item').click()
+                    })
                 } catch (e) {
                     this.alertType = 'error'
                 } finally {

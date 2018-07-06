@@ -35,6 +35,9 @@ export function apiLoadAds({zipInternalCodes = '750114', pageNumber = 1}) {
         })
         .then(response => response.data)
         .then(data => new Promise(resolve => parseString(data, {explicitArray: false}, (err, result) => resolve(result))))
+        .catch(error => {
+            console.error('Error when getting seloger announces', error);
+        })
 }
 
 function apiLoadAdsTransformed(options) {
@@ -50,7 +53,8 @@ function apiLoadAdsTransformed(options) {
                     let cover;
 
                     if (photosLength > 0) {
-                        cover = Array.isArray(ad.photos.photo) ? ad.photos.photo[0].stdUrl : ad.photos.photo.stdUrl;
+                        const picture = Array.isArray(ad.photos.photo) ? ad.photos.photo[0] : ad.photos.photo;
+                        cover = picture ? picture.stdurl : '';
                     }
 
                     return {

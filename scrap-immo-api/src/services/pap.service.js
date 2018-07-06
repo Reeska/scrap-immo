@@ -18,6 +18,9 @@ class PapService {
                 params: {
                     q: zipCode
                 }
+            })
+            .catch(error => {
+                console.error('Error when getting pap zips', zipCode, error);
             });
 
         if (!data.length) {
@@ -44,7 +47,10 @@ class PapService {
                 'recherche[prix][min]=400000&' +
                 'recherche[prix][max]=550000&' +
                 placeIds)
-            .then(response => response.data);
+            .then(response => response.data)
+            .catch(error => {
+                console.error('Error when getting pap announces', error);
+            });
     }
 
     async getAnnounce(id) {
