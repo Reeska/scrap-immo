@@ -19,7 +19,7 @@ async function findInternalZipCode(zipCode) {
     return codes[0].Params.ci;
 }
 
-export function apiLoadAds({zipInternalCodes = '750114', pageNumber = 1}) {
+export function apiLoadAds({zipInternalCodes = ['750114'], pageNumber = 1}) {
     return axios
         .get(API_DOMAIN + '/search.xml', {
             params: {
@@ -54,7 +54,7 @@ function apiLoadAdsTransformed(options) {
 
                     if (photosLength > 0) {
                         const picture = Array.isArray(ad.photos.photo) ? ad.photos.photo[0] : ad.photos.photo;
-                        cover = picture ? picture.stdurl : '';
+                        cover = picture ? picture.stdUrl : '';
                     }
 
                     return {

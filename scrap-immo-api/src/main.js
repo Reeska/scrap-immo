@@ -18,7 +18,7 @@ app.use(route.get('/', ctx => {
 
 app.use(route.get('/seloger', async (ctx) => {
     console.log('route /ads');
-    ctx.body = await apiLoadAds({...ctx.request.query});
+    ctx.body = await apiLoadAds({zipInternalCodes: ['750114']});
 }));
 
 app.use(route.get('/pap', async (ctx) => {
