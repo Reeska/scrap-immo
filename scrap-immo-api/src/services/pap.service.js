@@ -35,7 +35,7 @@ class PapService {
         return place.id;
     }
 
-    getAnnounces({zipInternalCodes}) {
+    getAnnounces({zipInternalCodes, priceMin = 400000, priceMax = 550000, sizeMin = 40, sizeMax}) {
         const placeIds = zipInternalCodes
             .map(code => 'recherche[geo][ids][]=' + code)
             .join('&');
@@ -43,9 +43,10 @@ class PapService {
         return axios
             .get(API_DOMAIN + '/immobilier/annonces?' +
                 'recherche[nb_pieces][min]=2&' +
-                'recherche[surface][min]=40&' +
-                'recherche[prix][min]=400000&' +
-                'recherche[prix][max]=550000&' +
+                'recherche[surface][min]=' + sizeMin + '&' +
+                (sizeMax ? 'recherche[surface][max]=' + sizeMax + '&' : '') +
+                'recherche[prix][min]=' + priceMin + '&' +
+                'recherche[prix][max]=' + priceMax + '&' +
                 placeIds)
             .then(response => response.data)
             .catch(error => {
@@ -58,10 +59,14 @@ class PapService {
         return data;
     }
 
-    async findAllAnnounces({zipCodes}) {
+    async findAllAnnounces({zipCodes, priceMin, priceMax, sizeMin, sizeMax}) {
         const zipInternalCodes = await Promise.all(zipCodes.map(this.findInternalZipCode.bind(this)));
 
-        const announces = await this.getAnnounces({zipInternalCodes});
+        const announces = await this.getAnnounces({zipInternalCodes, priceMin, priceMax, sizeMin, sizeMax});
+
+        if (!announces._embedded.annonce) {
+            return [];
+        }
 
         return Promise.all(announces._embedded.annonce.map(async ({id}) => {
             const announce = await this.getAnnounce(id);

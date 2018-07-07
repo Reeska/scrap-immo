@@ -19,7 +19,15 @@ async function findInternalZipCode(zipCode) {
     return codes[0].Params.ci;
 }
 
-export function apiLoadAds({zipInternalCodes = ['750114'], pageNumber = 1}) {
+export function apiLoadAds(
+    {
+        zipInternalCodes = ['750114'],
+        pageNumber = 1,
+        priceMin = 400000,
+        priceMax = 550000,
+        sizeMin = 40,
+        sizeMax = null
+    }) {
     return axios
         .get(API_DOMAIN + '/search.xml', {
             params: {
@@ -28,8 +36,8 @@ export function apiLoadAds({zipInternalCodes = ['750114'], pageNumber = 1}) {
                 idtypebien: 1,
                 naturebien: '1,2,4',
                 nb_pieces: '2,3',
-                pxbtw: '400000/530000',
-                surfacebtw: '40/NaN',
+                pxbtw: `${priceMin}/${priceMax}`,
+                surfacebtw: `${sizeMin}/${sizeMax ? sizeMax : 'NaN'}`,
                 'SEARCHpg': pageNumber
             }
         })
@@ -83,7 +91,7 @@ function apiLoadAdsTransformed(options) {
         })
 }
 
-export async function findAllAds({zipCodes = ['75014']}) {
+export async function findAllAds({zipCodes = ['75014'], priceMin = 400000, priceMax = 550000, sizeMin, sizeMax}) {
     let pageNumber = 1;
     let results;
     let items = [];
@@ -91,7 +99,7 @@ export async function findAllAds({zipCodes = ['75014']}) {
     const zipInternalCodes = await Promise.all(zipCodes.map(findInternalZipCode));
 
     do {
-        results = await apiLoadAdsTransformed({zipInternalCodes, pageNumber});
+        results = await apiLoadAdsTransformed({zipInternalCodes, pageNumber, priceMin, priceMax, sizeMin, sizeMax});
         pageNumber++;
 
         items = [...items, ...results.items];

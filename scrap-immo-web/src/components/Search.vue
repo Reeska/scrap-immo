@@ -1,15 +1,51 @@
 <template>
     <div class="hello">
-        <zips :value="zipCodes" @change="zipChanged"/>
+        <zips v-model="criteria.zipCodes" @change="criteriaChanged"/>
+
+        <v-container>
+            <v-layout row>
+                <v-text-field
+                        label="Minimal price"
+                        :hide-details="true"
+                        v-model="criteria.priceMin"
+                        @keypress.enter="criteriaChanged"
+                />
+
+                <v-text-field
+                        label="Maximal price"
+                        :hide-details="true"
+                        v-model="criteria.priceMax"
+                        @keypress.enter="criteriaChanged"
+                />
+
+                <v-text-field
+                        label="Minimal size"
+                        :hide-details="true"
+                        v-model="criteria.sizeMin"
+                        @keypress.enter="criteriaChanged"
+                />
+
+                <v-text-field
+                        label="Maximal size"
+                        :hide-details="true"
+                        v-model="criteria.sizeMax"
+                        @keypress.enter="criteriaChanged"
+                />
+            </v-layout>
+        </v-container>
 
         <v-container class="filter">
-            <v-radio-group v-model="filter.category" :hide-details="true" :row="true" class="radio-group-bla">
-                <v-radio :label="'All (' + all.length + ')'" value="all"/>
-                <v-radio :label="'Relevants (' + relevants.length + ')'" value="relevant"/>
-                <v-radio :label="'News (' + news.length + ')'" value="new"/>
-                <v-radio :label="'Favorites (' + favorites.length + ')'" value="favorite"/>
-                <v-radio :label="'Ignored (' + ignores.length + ')'" value="ignored"/>
-            </v-radio-group>
+            <v-layout row>
+                <v-radio-group v-model="filter.category" :hide-details="true" :row="true" class="radio-group-bla">
+                    <v-radio :label="'All (' + all.length + ')'" value="all"/>
+                    <v-radio :label="'Relevants (' + relevants.length + ')'" value="relevant"/>
+                    <v-radio :label="'News (' + news.length + ')'" value="new"/>
+                    <v-radio :label="'Favorites (' + favorites.length + ')'" value="favorite"/>
+                    <v-radio :label="'Ignored (' + ignores.length + ')'" value="ignored"/>
+                </v-radio-group>
+
+                <v-icon @click="loadAnnounces" class="refresh">refresh</v-icon>
+            </v-layout>
         </v-container>
 
         <div class="ads">
@@ -20,7 +56,7 @@
                 <span v-else-if="!loading">{{ filtredAds.length }} items</span>
             </v-alert>
 
-            <v-tabs v-model="activeGroup">
+            <v-tabs v-model="activeGroup" v-show="filtredAds.length > 0">
                 <v-tab
                         v-for="(value, key) in grouped"
                         :key="key"
@@ -51,8 +87,14 @@
         components: {Zips, Announce},
 
         data() {
-            const _zipCodes = window.localStorage.getItem('zipCodes')
-            const zipCodes = _zipCodes ? JSON.parse(_zipCodes) : ['75013', '75014'];
+            const _criteria = window.localStorage.getItem('criteria')
+            const criteria = _criteria ? JSON.parse(_criteria) : {
+                zipCodes: ['75013', '75014'],
+                priceMin: 400000,
+                priceMax: 550000,
+                sizeMin: 40,
+                sizeMax: null
+            }
 
             return {
                 items: [],
@@ -60,9 +102,11 @@
                 filter: {
                     category: 'relevant'
                 },
-                zipCodes,
                 activeGroup: null,
-                alertType: 'info'
+                alertType: 'info',
+                criteria,
+                zips: ['75013', '75014'],
+                bla: []
             }
         },
 
@@ -126,18 +170,18 @@
                 try {
                     const response = await axios.get(API_URL + '/ads', {
                         params: {
-                            zipCodes: this.zipCodes.join(',')
+                            ...this.criteria,
+                            zipCodes: this.criteria.zipCodes.join(','),
                         }
                     });
 
                     this.items = response.data;
 
-                    this.activeGroup = '75014';
-
                     this.$nextTick(() => {
                         document.querySelector('.tabs__item').click()
                     })
                 } catch (e) {
+                    console.error('Error during load announces', e)
                     this.alertType = 'error'
                 } finally {
                     this.loading = false;
@@ -148,8 +192,12 @@
                 this.items = [...this.items]
             },
 
-            zipChanged(zipCodes) {
-                window.localStorage.setItem('zipCodes', JSON.stringify(zipCodes))
+            saveCriteria() {
+                window.localStorage.setItem('criteria', JSON.stringify(this.criteria))
+            },
+
+            criteriaChanged() {
+                this.saveCriteria()
                 this.loadAnnounces()
             }
         }
@@ -160,6 +208,10 @@
     @import '../scss/variable';
 
     $content-with: 1240px;
+
+    .refresh {
+        cursor: pointer;
+    }
 
     .filter {
         background-color: #efefef;

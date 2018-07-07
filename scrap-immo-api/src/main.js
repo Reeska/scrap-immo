@@ -29,10 +29,14 @@ app.use(route.get('/pap', async (ctx) => {
 app.use(route.get('/ads', async (ctx) => {
     console.log('route /ads');
 
-    const {zipCodes} = {zipCodes: '75014', ...ctx.request.query};
+    const {zipCodes, priceMin, priceMax, sizeMin, sizeMax} = {zipCodes: '75014', ...ctx.request.query};
 
     ctx.body = await getAnnounces({
-        zipCodes: zipCodes.split(',')
+        zipCodes: zipCodes.split(','),
+        priceMin,
+        priceMax,
+        sizeMin,
+        sizeMax
     });
 }));
 
