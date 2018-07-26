@@ -1,5 +1,6 @@
 import {papService} from './pap.service';
 import {findAllAds} from './seloger.service';
+import {leboncoinService} from './leboncoin.service';
 import {createAd, getAds} from './announces.repository';
 
 const PORTE_ORLEANS = 'porteOrleans';
@@ -7,13 +8,18 @@ const CITE_UNIVERSITAIRE = 'citéUniversitaire';
 const PERNETY = 'pernety';
 
 export async function getAnnounces(params) {
-    const announcesArray = await Promise.all([papService.findAllAnnounces(params), findAllAds(params)]);
+    const announcesArray = await Promise.all([
+        papService.findAllAnnounces(params),
+        leboncoinService.findAllAnnounces(params),
+        findAllAds(params)
+    ]);
 
     const localAds = await getAds();
     const mapLocalAds = {};
     localAds.forEach(ad => mapLocalAds[ad.id] = ad);
 
-    const augmentedAnnounces = announcesArray.reduce((accu, value) => [...accu, ...value], [])
+    const augmentedAnnounces = announcesArray
+        .reduce((accu, value) => [...accu, ...value], [])
         .map(transform)
         .map(augmented(mapLocalAds));
 

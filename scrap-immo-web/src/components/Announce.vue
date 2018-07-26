@@ -159,6 +159,13 @@
                     box-shadow: 0 1px 6px 1px #e10034;
                     background-color: #e10034;
                 }
+
+                &.leboncoin {
+                    border: 1px solid #f56a2b;
+                    color: white;
+                    box-shadow: 0 1px 6px 1px #fb9f75;
+                    background-color: #f56a2b;
+                }
             }
 
             .new {
@@ -294,10 +301,10 @@
         }
     }
 
-    @media screen and (max-width: 620px) {
-        .ad {
-            width: 100%;
-            height: 200px;
-        }
-    }
+    /*@media screen and (max-width: 620px) {*/
+        /*.ad {*/
+            /*width: 100%;*/
+            /*height: 200px;*/
+        /*}*/
+    /*}*/
 </style>
